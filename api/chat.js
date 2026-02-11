@@ -35,17 +35,25 @@ export default async function handler(req, res) {
 
     // 文生图接口重构（魔塔标准接入）
     if (mode === "image") {
-      const model = body.model ?? "MAILAND/majicflus_v1";
+      const model = "wanx/wanx-v1";
       const prompt = body.prompt ?? "";
       if (!prompt) return res.status(400).json({ error: "Missing prompt" });
 
-      const response = await fetch(`${MODELSCOPE_BASE_URL}/images/generations`, {
+      const response = await fetch(`${MODELSCOPE_BASE_URL}/services/aigc/text2image/generation`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`
         },
-        body: JSON.stringify({ model, prompt })
+        body: JSON.stringify({ 
+          model, 
+          prompt,
+          parameters: {
+            style: "<lora:lora_weights:0.8> 风格:赛博朋克,未来科技,霓虹灯,机械纪元",
+            size: "1024*1024",
+            negative_prompt: "模糊,低分辨率,畸形,（多余的肢体）,（残缺的身体）,（变形的四肢）,（连体）,（丑陋的）,（多余的手指）,（残缺的手指）,（残缺的）"
+          }
+        })
       });
 
       const data = await response.json();
