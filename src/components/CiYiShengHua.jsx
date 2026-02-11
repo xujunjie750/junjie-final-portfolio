@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
-import { showcase } from "../data";
+
+const CI_PAI = ["自动选择", "念奴娇", "水调歌头", "蝶恋花", "浣溪沙", "虞美人", "满江红", "西江月", "如梦令"];
+const STYLE = ["水墨画", "工笔画", "泼墨", "写意"];
 
 async function postJson(url, body) {
   const res = await fetch(url, {
@@ -16,8 +18,9 @@ async function postJson(url, body) {
 }
 
 export function CiYiShengHua() {
-  const hint = useMemo(() => showcase.ciYIShengHua.hint, []);
-  const [theme, setTheme] = useState("");
+  const [mood, setMood] = useState("");
+  const [ciPai, setCiPai] = useState("自动选择");
+  const [style, setStyle] = useState("水墨画");
   const [isLoading, setIsLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
   const [error, setError] = useState("");
@@ -30,7 +33,9 @@ export function CiYiShengHua() {
     try {
       const img = await postJson("/api/chat", { 
         mode: "image", 
-        prompt: `古风, ${theme || "春风入墨"}` 
+        prompt: `${mood || "今天下雪了,心情很冷"}`,
+        ciPai,
+        style,
       });
       const url = img?.output?.images?.[0]?.url ?? "";
       if (!url) {
@@ -45,29 +50,55 @@ export function CiYiShengHua() {
   }
 
   return (
-    <div className="glassPanel">
-      <div className="panelHeader">
-        <div className="panelTitle">{showcase.ciYIShengHua.title}</div>
-        <div className="panelHint">{hint}</div>
+    <div className="cys-panel">
+      <div className="cys-row">
+        <div className="cys-label">诉说你的心情</div>
+        <textarea
+          className="cys-textarea"
+          value={mood}
+          onChange={(e) => setMood(e.target.value)}
+          placeholder="今天下雪了,心情很冷"
+        />
       </div>
 
-      <div className="panelRow">
-        <input
-          className="textInput"
-          value={theme}
-          onChange={(e) => setTheme(e.target.value)}
-          placeholder="例如：疏雨、梅影、江南、归舟、月下"
-        />
-        <button className="primaryButton" type="button" onClick={onGenerate} disabled={isLoading}>
-          {isLoading ? "生成中…" : "词意生花"}
-        </button>
+      <div className="cys-row">
+        <div className="cys-label">词牌名 (可选)</div>
+        <div className="cys-button-group">
+          {CI_PAI.map((item) => (
+            <button
+              key={item}
+              className={`cys-button ${ciPai === item ? "active" : ""}`}
+              onClick={() => setCiPai(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
       </div>
+
+      <div className="cys-row">
+        <div className="cys-label">选择画风</div>
+        <div className="cys-button-group">
+          {STYLE.map((item) => (
+            <button
+              key={item}
+              className={`cys-button ${style === item ? "active" : ""}`}
+              onClick={() => setStyle(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <button className="cys-generate-button" type="button" onClick={onGenerate} disabled={isLoading}>
+        {isLoading ? "生成中…" : "生成宋词与插图"}
+      </button>
 
       {error ? <div className="errorText">{error}</div> : null}
 
       {imageUrl ? (
-        <div className="paperCard">
-          <div className="paperTitle">生成画面</div>
+        <div className="cys-image-card">
           <img className="resultImage" src={imageUrl} alt="生成画面" />
         </div>
       ) : null}
