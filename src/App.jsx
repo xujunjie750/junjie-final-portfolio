@@ -32,15 +32,24 @@ function App() {
             一份从痛点出发、用 AI 提速、以交付收尾的七周成长记录。
           </p>
           <div className="heroActions">
-            <a className="ghostButton" href="#journey">
+            <button
+              className="ghostButton"
+              onClick={() => document.getElementById('journey')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               看成长历程
-            </a>
-            <a className="ghostButton" href="#about">
+            </button>
+            <button
+              className="ghostButton"
+              onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               MVP 构思
-            </a>
-            <a className="primaryLink" href="#showcase">
+            </button>
+            <button
+              className="primaryLink"
+              onClick={() => document.getElementById('showcase')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               看作品展示
-            </a>
+            </button>
           </div>
         </div>
       </header>
